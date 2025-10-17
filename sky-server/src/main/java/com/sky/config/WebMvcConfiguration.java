@@ -44,13 +44,14 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Bean
     public Docket docket() {
         ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("苍穹外卖项目接口文档")
+                .title("take out app API document")
                 .version("2.0")
-                .description("苍穹外卖项目接口文档")
+                .description("take out app API document")
                 .build();
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
                 .select()
+                // scan the specified package and generate API documentation
                 .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))
                 .paths(PathSelectors.any())
                 .build();
@@ -60,9 +61,21 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     /**
      * 设置静态资源映射
      * @param registry
+     * classpath:/META-INF/resources/ = “look in the classpath for directories starting with META-INF/resources/”
      */
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
+
+
+// we can also use the following method to set static resource mapping for swagger-ui(English version),
+// but remember to add the corresponding dependency
+
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        registry.addResourceHandler("/swagger-ui*/**")
+//                .addResourceLocations("classpath:/META-INF/resources/webjars/")
+//                .resourceChain(false);
+//    }
 }
