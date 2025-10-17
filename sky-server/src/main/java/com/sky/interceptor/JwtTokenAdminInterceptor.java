@@ -1,6 +1,7 @@
 package com.sky.interceptor;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.properties.JwtProperties;
 import com.sky.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -23,7 +24,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     private JwtProperties jwtProperties;
 
     /**
-     * 校验jwt
+     * verify jwt token
      *
      * @param request
      * @param response
@@ -32,25 +33,29 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //判断当前拦截到的是Controller的方法还是其他资源
+        //determine if the handler is a controller. If so , need to verify the token
         if (!(handler instanceof HandlerMethod)) {
-            //当前拦截到的不是动态方法，直接放行
+            // not a controller , let it go
             return true;
         }
 
-        //1、从请求头中获取令牌
+        //1、get token from header
         String token = request.getHeader(jwtProperties.getAdminTokenName());
 
-        //2、校验令牌
+        //2、verify token
         try {
-            log.info("jwt校验:{}", token);
+            log.info("jwt  verification:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
-            log.info("当前员工id：", empId);
-            //3、通过，放行
+
+            // hold the current emp id in ThreadLocal so that service layer can use it
+            BaseContext.setCurrentId(empId);
+
+            log.info("id of current employ：", empId);
+            //3、pass verification and let it go to the corresponding controller
             return true;
         } catch (Exception ex) {
-            //4、不通过，响应401状态码
+            //4、verification failed
             response.setStatus(401);
             return false;
         }
