@@ -68,9 +68,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * save new employee
+     *
      * @param employeeDTO
      */
-    public void save(EmployeeDTO employeeDTO){
+    public void save(EmployeeDTO employeeDTO) {
         Employee newEmployee = new Employee();
         BeanUtils.copyProperties(employeeDTO, newEmployee);
 
@@ -94,6 +95,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * employee paging query
+     *
      * @param pageQueryDTO
      * @return
      */
@@ -115,20 +117,45 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * modify employee status
+     *
      * @param status
      * @param id
      */
-    public void modifyStatus(Integer status, Long id){
+    public void modifyStatus(Integer status, Long id) {
         // right now we can just update the status field
         Employee employee = Employee.builder()
                 .id(id)
                 .status(status)
                 .build();
-        // TODO: set update_user and update_time
-        // if we want make this update more general, pass in a DTO instead of just status and id
-        // BeanUtils.copyProperties(employeeDTO, employee);
-        // then field that need to be updated will be set in employee object, other fields will be null
-        // mybatis will keep the field that is null unchanged
+
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * get employee by id
+     *
+     * @param id
+     * @return
+     */
+    public Employee getEmployeeById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        // set a masked password before return
+        employee.setPassword("****");
+        return employee;
+    }
+
+    /**
+     * update employee info
+     *
+     * @param employeeDTO
+     */
+    public void updateEmpInfo(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        employee.setUpdateTime(LocalDateTime.now());
+        // interceptor has already set the current user id into BaseContext
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }
