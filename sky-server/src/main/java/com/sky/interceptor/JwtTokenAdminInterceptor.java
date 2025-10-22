@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * jwt令牌校验的拦截器
+ * this will be executed before the controller method is invoked
+ * cause we have registered it in WebMvcConfiguration
  */
 @Component
 @Slf4j
@@ -39,13 +40,15 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        //1、get token from header
+        //1、get token from header， jwtProperties.getAdminTokenName() get the token name we configured in JwtProperties
         String token = request.getHeader(jwtProperties.getAdminTokenName());
 
         //2、verify token
         try {
             log.info("jwt  verification:{}", token);
+            // claims is the payload in the token
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
+            // cause when jenerate the token, we put emp id in the payload
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
 
             // hold the current emp id in ThreadLocal so that service layer can use it

@@ -1,16 +1,20 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -79,11 +84,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         newEmployee.setUpdateTime(LocalDateTime.now());
 
         // set the operator
-        newEmployee.setCreateUser(BaseContext.getCurrentId()); // TODO: replace with actual user id
-        newEmployee.setUpdateUser(BaseContext.getCurrentId()); // TODO: replace with actual user id
+        newEmployee.setCreateUser(BaseContext.getCurrentId()); //
+        newEmployee.setUpdateUser(BaseContext.getCurrentId()); //
 
         // if the employee.name is already exists, database will throw duplicate key exception then we can handle it in GlobalExceptionHandler
         employeeMapper.insert(newEmployee);
+
+    }
+
+    /**
+     * employee paging query
+     * @param pageQueryDTO
+     * @return
+     */
+    public PageResult getPageQuery(EmployeePageQueryDTO pageQueryDTO) {
+        // This line tells PageHelper: “The next SQL query should be paginated.”
+        // PageHelper intercepts the SQL and returns a Page instead of a plain List.
+        PageHelper.startPage(pageQueryDTO.getPage(), pageQueryDTO.getPageSize());
+
+        // pageHelper will add limit to the sql automatically
+        // PageHelper wraps the result List<Employee> into a Page<Employee> which contains more pagination info
+        Page<Employee> page = employeeMapper.getPagedEmployees(pageQueryDTO);
+
+        long total = page.getTotal();
+        List<Employee> records = page.getResult();
+
+        return new PageResult(total, records);
 
     }
 

@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 /**
- * 全局异常处理器，处理项目中抛出的业务异常
+ *  Global exception handler
+ * → Controller throws an exception
+ * → DispatcherServlet catches it
+ * → looks for a local @ExceptionHandler
+ * → if none, checks global @ControllerAdvice → executes the matching exception handler method.
  */
 @RestControllerAdvice
 @Slf4j
