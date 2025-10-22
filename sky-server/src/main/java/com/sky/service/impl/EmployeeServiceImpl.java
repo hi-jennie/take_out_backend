@@ -51,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // using md5 or BCryptPasswordEncoder
         password = DigestUtils.md5DigestAsHex(password.getBytes());
-        // TODO 后期需要进行md5加密，然后再进行比对
+
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -113,4 +113,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    /**
+     * modify employee status
+     * @param status
+     * @param id
+     */
+    public void modifyStatus(Integer status, Long id){
+        // right now we can just update the status field
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+        // TODO: set update_user and update_time
+        // if we want make this update more general, pass in a DTO instead of just status and id
+        // BeanUtils.copyProperties(employeeDTO, employee);
+        // then field that need to be updated will be set in employee object, other fields will be null
+        // mybatis will keep the field that is null unchanged
+
+        employeeMapper.update(employee);
+    }
 }

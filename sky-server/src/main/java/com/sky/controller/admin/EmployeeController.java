@@ -92,4 +92,14 @@ public class EmployeeController {
         return Result.success(result);
 
     }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("modify employee status")
+    // /employee/status/1?id=10 @PathVariable is only for path placeholders.
+    // for query parameters, we still use @RequestParam or directly use the parameter name
+    public Result modifyStatus(@PathVariable Integer status, Long id) {
+        log.info("modify employee status: {}, {}", status, id);
+        employeeService.modifyStatus(status, id);
+        return Result.success();
+    }
 }
