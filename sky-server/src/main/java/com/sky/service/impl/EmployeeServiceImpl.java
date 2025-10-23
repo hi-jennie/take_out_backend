@@ -81,12 +81,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         newEmployee.setStatus(StatusConstant.ENABLE);
 
         // set the timestamps
-        newEmployee.setCreateTime(LocalDateTime.now());
-        newEmployee.setUpdateTime(LocalDateTime.now());
+        // newEmployee.setCreateTime(LocalDateTime.now());
+        // newEmployee.setUpdateTime(LocalDateTime.now());
 
         // set the operator
-        newEmployee.setCreateUser(BaseContext.getCurrentId()); //
-        newEmployee.setUpdateUser(BaseContext.getCurrentId()); //
+        // newEmployee.setCreateUser(BaseContext.getCurrentId());
+        // newEmployee.setUpdateUser(BaseContext.getCurrentId());
 
         // if the employee.name is already exists, database will throw duplicate key exception then we can handle it in GlobalExceptionHandler
         employeeMapper.insert(newEmployee);
@@ -153,9 +153,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
         // interceptor has already set the current user id into BaseContext
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
     }
