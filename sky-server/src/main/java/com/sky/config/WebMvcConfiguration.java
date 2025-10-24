@@ -33,8 +33,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     /**
      * register interceptor
      * we define JwtTokenAdminInterceptor elsewhere, here we just need to register it
+     *
      * @param registry
      */
+
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("starting to register interceptor...");
         registry.addInterceptor(jwtTokenAdminInterceptor)
@@ -44,6 +46,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     /**
      * 通过knife4j生成接口文档
+     *
      * @return
      */
     @Bean
@@ -65,8 +68,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     /**
      * 设置静态资源映射
-     * @param registry
-     * classpath:/META-INF/resources/ = “look in the classpath for directories starting with META-INF/resources/”
+     *
+     * @param registry classpath:/META-INF/resources/ = “look in the classpath for directories starting with META-INF/resources/”
      */
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
