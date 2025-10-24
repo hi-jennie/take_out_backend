@@ -32,7 +32,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     /**
      * register interceptor
-     *
+     * we define JwtTokenAdminInterceptor elsewhere, here we just need to register it
      * @param registry
      */
     protected void addInterceptors(InterceptorRegistry registry) {
