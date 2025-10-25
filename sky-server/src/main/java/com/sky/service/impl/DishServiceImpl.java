@@ -64,6 +64,7 @@ public class DishServiceImpl implements DishService {
         return new PageResult(page.getTotal(), page.getResult());
     }
 
+    @Transactional
     public void deleteBatch(List<Long> ids) {
         // dish that is on sale cannot be deleted
         for (Long id : ids) {
@@ -80,10 +81,17 @@ public class DishServiceImpl implements DishService {
         }
 
         // delete the dish
-        for (Long id : ids) {
-            dishMapper.deleteById(id);
-            // delete flavors associated with the dish
-            dishFlavorMapper.deleteByDishId(id);
-        }
+        // Not good practice, causes multiple database calls
+//        for (Long id : ids) {
+//            dishMapper.deleteById(id);
+//            // delete flavors associated with the dish
+//            dishFlavorMapper.deleteByDishId(id);
+//        }
+
+        // Better practice, batch delete
+        // sql: delete from dish where id in (?,?,?)
+        dishMapper.deleteBatch(ids);
+        // sql: delete from dish_flavor where dish_id in (?,?,?)
+        dishFlavorMapper.deleteByDishIds(ids);
     }
 }
