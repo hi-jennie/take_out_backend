@@ -2,12 +2,16 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -26,6 +30,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     @Override
     // It tells Spring that all the database operations inside this method should succeed or fail together.
@@ -48,12 +55,35 @@ public class DishServiceImpl implements DishService {
         }
     }
 
-    @Override
+
     public PageResult queryPage(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
 
         Page<DishVO> page = dishMapper.queryPage(dishPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    public void deleteBatch(List<Long> ids) {
+        // dish that is on sale cannot be deleted
+        for (Long id : ids) {
+            Dish dish = dishMapper.getDishById(id);
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        // dish that is inside a setMeal can't be deleted(setmeal_dish table is a relation table between setmeal and dish, it's many-to-many)
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
+        if (setmealIds != null && setmealIds.size() > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        // delete the dish
+        for (Long id : ids) {
+            dishMapper.deleteById(id);
+            // delete flavors associated with the dish
+            dishFlavorMapper.deleteByDishId(id);
+        }
     }
 }
