@@ -40,6 +40,14 @@ public class DishController {
         return Result.success(page);
     }
 
+    @PostMapping("/status/{status}")
+    @ApiOperation("update dish status")
+    public Result updateStatus(@PathVariable Integer status, @RequestParam("id") Long id) {
+        log.info("update dish status to {} for id:{}", status, id);
+        dishService.updateDishStatus(status, id);
+        return Result.success();
+    }
+
     @DeleteMapping()
     @ApiOperation("delete dishes in batch by ids")
     public Result deleteBatch(@RequestParam("ids") List<Long> ids) {
@@ -48,11 +56,31 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * in frontend, get the dish first used to display the original data in form and then update it
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     @ApiOperation("get dish by id")
     public Result<DishVO> getById(@PathVariable Long id) {
         log.info("get dish by id:{}", id);
         DishVO dishVO = dishService.getByIdWithFlavor(id);
         return Result.success(dishVO);
+    }
+
+    /**
+     * update dish with flavor
+     *
+     * @param dishDTO
+     * @return
+     */
+    @PutMapping()
+    @ApiOperation("update dish with flavor")
+    public Result update(@RequestBody DishDTO dishDTO) {
+        log.info("update dish with flavor:{}", dishDTO);
+        dishService.updateDishWithFlavor(dishDTO);
+        return Result.success();
     }
 }

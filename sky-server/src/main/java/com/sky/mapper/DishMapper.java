@@ -47,4 +47,12 @@ public interface DishMapper {
     void deleteById(Long id);
 
     void deleteBatch(List<Long> ids);
+
+    /**
+     * Update dish with a new dish object
+     *
+     * @param dish
+     */
+    @Autofill(value = OperationType.UPDATE)
+    void update(Dish dish);
 }
