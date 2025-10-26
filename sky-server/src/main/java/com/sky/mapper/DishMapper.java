@@ -27,11 +27,22 @@ public interface DishMapper {
     @Autofill(value = OperationType.INSERT)
     void insert(Dish dish);
 
+    /**
+     * Pagination query for dishes limit to 10 items per page
+     *
+     * @param dishPageQueryDTO
+     * @return
+     */
     Page<DishVO> queryPage(DishPageQueryDTO dishPageQueryDTO);
 
     @Select("select * from dish where id = #{id}")
     Dish getDishById(Long Id);
 
+    /**
+     * Delete dish by id, but we implement this function with delete batch which cover this single delete*
+     *
+     * @param id
+     */
     @Delete("delete from dish where id = #{id}")
     void deleteById(Long id);
 

@@ -94,4 +94,18 @@ public class DishServiceImpl implements DishService {
         // sql: delete from dish_flavor where dish_id in (?,?,?)
         dishFlavorMapper.deleteByDishIds(ids);
     }
+
+    public DishVO getByIdWithFlavor(Long id) {
+        // get dish by id in dish table
+        Dish dish = dishMapper.getDishById(id);
+
+        // get flavor in dish_flavor table according dish_id
+        List<DishFlavor> flavors = dishFlavorMapper.getFlavorsByDishId(id);
+
+        // encapsulate to DishVO
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(flavors);
+        return dishVO;
+    }
 }
