@@ -160,6 +160,12 @@ public class DishServiceImpl implements DishService {
         }
     }
 
+    /**
+     * get dishes by categoryId so that we can display dishes when creating a setmeal
+     *
+     * @param categoryId
+     * @return
+     */
     public List<Dish> getDishes(Long categoryId) {
         List<Dish> dishes = dishMapper.getDishesByCategoryId(categoryId);
         return dishes;
