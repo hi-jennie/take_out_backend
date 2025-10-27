@@ -143,7 +143,7 @@ public class DishServiceImpl implements DishService {
         dishMapper.update(dish);
 
         if (status == StatusConstant.DISABLE) {
-            // 如果是停售操作，还需要将包含当前菜品的套餐也停售
+            // if dish is disabled, set the status of setmeals containing this dish to disabled
             List<Long> dishIds = new ArrayList<>();
             dishIds.add(id);
             // select setmeal_id from setmeal_dish where dish_id in (?,?,?)
@@ -158,5 +158,10 @@ public class DishServiceImpl implements DishService {
                 }
             }
         }
+    }
+
+    public List<Dish> getDishes(Long categoryId) {
+        List<Dish> dishes = dishMapper.getDishesByCategoryId(categoryId);
+        return dishes;
     }
 }
