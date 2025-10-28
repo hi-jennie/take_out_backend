@@ -143,4 +143,25 @@ public class SetmealServiceImpl implements SetmealService {
         setmealDishMapper.batchInsert(setmealDishes);
 
     }
+
+    /**
+     * get setmeal by id with dishes
+     *
+     * @param id
+     * @return
+     */
+    public SetmealVO getByIdWithDish(Long id) {
+        // get setmeal from setmeal table
+        Setmeal setmeal = setmealMapper.getById(id);
+
+        // get dishes from setmeal_dish table
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
+
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, setmealVO);
+        setmealVO.setSetmealDishes(setmealDishes);
+
+        return setmealVO;
+
+    }
 }
