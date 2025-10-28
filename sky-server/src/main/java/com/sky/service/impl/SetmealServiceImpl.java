@@ -6,14 +6,17 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private SetmealMapper setmealMapper;
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     public void saveWithDish(SetmealDTO setmealDTO) {
         // save setmeal in setmeal table
@@ -86,7 +92,21 @@ public class SetmealServiceImpl implements SetmealService {
      * @param status
      * @param id
      */
+    @Transactional
     public void enableOrDisable(Integer status, Long id) {
+        // if the setmeal contain dishes that are not available, it cannot be enabled
+        if (status == StatusConstant.ENABLE) {
+            // get dishIds in setmeal_dish table
+            List<Long> dishIds = setmealDishMapper.getDishIdsBySetmealId(id);
+            // get corresponding dish through dishIds
+            List<Dish> dishes = dishMapper.getDishesByIds(dishIds);
+            for (Dish dish : dishes) {
+                if (dish.getStatus() == StatusConstant.DISABLE) {
+                    throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
+            }
+        }
+
         Setmeal setmeal = Setmeal.builder()
                 .id(id)
                 .status(status)

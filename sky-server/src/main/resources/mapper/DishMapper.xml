@@ -28,6 +28,15 @@
         order by d.create_time desc
     </select>
 
+    <!--    get dishes by ids-->
+    <select id="getDishesByIds" resultType="com.sky.entity.Dish">
+        select * from dish where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!--   delete dish in batch-->
     <delete id="deleteBatch">
         delete from dish
         where id in

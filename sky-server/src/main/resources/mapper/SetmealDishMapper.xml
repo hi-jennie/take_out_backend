@@ -23,7 +23,11 @@
             #{dishId}
         </foreach>
     </select>
-    <select id="getDishIdsBySetmealId" resultType="java.lang.Long">
 
+    <!--   get dish ids according setmeal id -->
+    <select id="getDishIdsBySetmealId" resultType="java.lang.Long">
+        select s.dish_id
+        from setmeal_dish s
+        where setmeal_id = #{id}
     </select>
 </mapper>
