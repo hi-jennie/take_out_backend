@@ -26,6 +26,15 @@
         where id=#{id};
     </update>
 
+    <!--    delete setmeal in batch according ids -->
+    <delete id="deleteByIds">
+        delete
+        from setmeal where id in
+        <foreach collection="ids" close=")" open="(" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
+
     <!--    page query: s.name/s.status/s.category_id in case there is duplicated name  -->
     <select id="pageQuery" resultType="com.sky.vo.SetmealVO">
         select s.*, c.name as categoryName

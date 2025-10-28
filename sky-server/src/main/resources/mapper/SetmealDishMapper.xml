@@ -8,6 +8,14 @@
             (#{item.setmealId},#{item.dishId},#{item.name},#{item.price},#{item.copies})
         </foreach>
     </insert>
+
+    <!--   delete in batch according setmeal ids -->
+    <delete id="deleteByIds">
+        delete from setmeal_dish where setmeal_id in
+        <foreach collection="ids" close=")" open="(" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
     <select id="getSetmealIdsByDishIds" resultType="java.lang.Long">
         select setmeal_id from setmeal_dish
         where dish_id in
