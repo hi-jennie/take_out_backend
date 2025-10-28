@@ -58,5 +58,18 @@ public class SetmealController {
         return Result.success();
     }
 
-
+    /**
+     * enable or disable setmeal
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("enable or disable setmeal")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        setmealService.enableOrDisable(status, id);
+        return Result.success();
+    }
 }

@@ -79,4 +79,19 @@ public class SetmealServiceImpl implements SetmealService {
         // delete dish in setmeal_dish table according setmeal id
         setmealDishMapper.deleteByIds(ids);
     }
+
+    /**
+     * enable or disable setmeal
+     *
+     * @param status
+     * @param id
+     */
+    public void enableOrDisable(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
+
+    }
 }
