@@ -72,4 +72,18 @@ public class SetmealController {
         setmealService.enableOrDisable(status, id);
         return Result.success();
     }
+
+    /**
+     * update setmeal information
+     *
+     * @param setmealDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("update setmeal information")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
+    public Result update(@RequestBody SetmealDTO setmealDTO) {
+        setmealService.update(setmealDTO);
+        return Result.success();
+    }
 }

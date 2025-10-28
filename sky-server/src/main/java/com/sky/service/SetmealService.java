@@ -13,6 +13,8 @@ public interface SetmealService {
     PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     void deleteBatch(List<Long> ids);
-    
+
     void enableOrDisable(Integer status, Long id);
+
+    void update(SetmealDTO setmealDTO);
 }

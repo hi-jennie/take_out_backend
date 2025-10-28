@@ -23,4 +23,7 @@
             #{dishId}
         </foreach>
     </select>
+    <select id="getDishIdsBySetmealId" resultType="java.lang.Long">
+
+    </select>
 </mapper>
