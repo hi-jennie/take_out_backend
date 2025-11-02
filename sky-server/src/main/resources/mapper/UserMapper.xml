@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.UserMapper">
+    <!--   insert useGeneratedKeys="true" keyProperty="id" 让数据库自动生成的主键（id）自动回填到 Java 对象中。-->
+    <insert id="insert">
+        insert into user(openid, name, phone, sex, id_number, avatar, create_time)
+        VALUES (#{openid}, #{name}, #{phone}, #{sex}, #{idNumber}, #{avatar}, #{createTime})
+    </insert>
+</mapper>
