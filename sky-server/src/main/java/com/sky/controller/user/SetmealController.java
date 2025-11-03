@@ -4,10 +4,12 @@ import com.sky.constant.StatusConstant;
 import com.sky.entity.Setmeal;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,4 +39,16 @@ public class SetmealController {
         return Result.success(list);
     }
 
+    /**
+     * get dish list by setmealId
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/dish/{id}")
+    @ApiOperation("get dishes by setmealId")
+    public Result<List<DishItemVO>> dishList(@PathVariable("id") Long id) {
+        List<DishItemVO> list = setmealService.getDishItemById(id);
+        return Result.success(list);
+    }
 }

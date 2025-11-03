@@ -59,4 +59,10 @@
             <if test="status != null">and status = #{status}</if>
         </where>
     </select>
+    <select id="getDishItemBySetmealId" resultType="com.sky.vo.DishItemVO">
+        select dish.name, s.copies, dish.image, dish.description
+        from setmeal_dish s
+                 left join dish on s.dish_id = dish.id
+        where setmeal_id = #{setmealId}
+    </select>
 </mapper>
