@@ -59,4 +59,16 @@
         </set>
         where id = #{id}
     </update>
+
+    <select id="getDishList" resultType="com.sky.entity.Dish">
+        select * from dish
+        <where>
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="categoryId != null">AND category_id = #{categoryId}</if>
+            <if test="price != null">AND price = #{price}</if>
+            <if test="image != null and image != ''">AND image = #{image}</if>
+            <if test="description != null and description != ''">AND description = #{description}</if>
+            <if test="status != null">AND status = #{status}</if>
+        </where>
+    </select>
 </mapper>

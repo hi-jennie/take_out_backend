@@ -60,4 +60,12 @@ public interface DishMapper {
     List<Dish> getDishesByCategoryId(Long categoryId);
 
     List<Dish> getDishesByIds(List<Long> ids);
+
+    /**
+     * get dishes list and param dish contain the query condition;
+     *
+     * @param dish
+     * @return
+     */
+    List<Dish> getDishList(Dish dish);
 }
