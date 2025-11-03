@@ -34,4 +34,6 @@ public interface SetmealMapper {
 
     @Select("select * from setmeal where id = #{id}")
     Setmeal getById(Long id);
+    
+    List<Setmeal> getList(Setmeal setmeal);
 }

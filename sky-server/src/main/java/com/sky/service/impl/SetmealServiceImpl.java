@@ -162,6 +162,11 @@ public class SetmealServiceImpl implements SetmealService {
         setmealVO.setSetmealDishes(setmealDishes);
 
         return setmealVO;
+    }
 
+    public List<Setmeal> list(Setmeal setmeal) {
+        // get setmeal in setmeal table according category_id
+        List<Setmeal> setmeals = setmealMapper.getList(setmeal);
+        return setmeals;
     }
 }

@@ -52,4 +52,11 @@
         </where>
         order by update_time desc
     </select>
+    <select id="getList" resultType="com.sky.entity.Setmeal">
+        select * from setmeal
+        <where>
+            <if test="categoryId != null">and category_id = #{categoryId}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+    </select>
 </mapper>
