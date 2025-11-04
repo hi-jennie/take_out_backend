@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 根据分类id查询菜品
@@ -32,14 +35,27 @@ public class DishController {
     @GetMapping("/list")
     @ApiOperation("get dishes by categoryId")
     public Result<List<DishVO>> list(Long categoryId) {
+        // construct the query key
+        String key = "dish_" + categoryId;
+
+        // query in redis cache first
+        List<DishVO> dishes = (List<DishVO>) redisTemplate.opsForValue().get(key);
+        if (dishes != null && dishes.size() > 0) {
+            log.info("Get dishes from redis...");
+            return Result.success(dishes);
+        }
+
         // this is used to encapsulate query conditions
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//only query dishes that are available
 
-        List<DishVO> list = dishService.listWithFlavor(dish);
+        // query from database
+        dishes = dishService.listWithFlavor(dish);
+        // store the query result into redis
+        redisTemplate.opsForValue().set(key, dishes);
 
-        return Result.success(list);
+        return Result.success(dishes);
     }
 
 }

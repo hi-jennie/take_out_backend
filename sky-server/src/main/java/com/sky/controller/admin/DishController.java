@@ -11,9 +11,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -24,11 +26,17 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @PostMapping
     @ApiOperation("add new dish")
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("add new dish");
         dishService.saveWithFlavor(dishDTO);
+        // clear cache with specific pattern
+        String pattern = "dish_" + dishDTO.getCategoryId();
+        clearCache(pattern);
         return Result.success();
     }
 
@@ -46,6 +54,8 @@ public class DishController {
     public Result updateStatus(@PathVariable Integer status, @RequestParam("id") Long id) {
         log.info("update dish status to {} for id:{}", status, id);
         dishService.updateDishStatus(status, id);
+        // clear all dish cache
+        clearCache("dish_*");
         return Result.success();
     }
 
@@ -54,6 +64,8 @@ public class DishController {
     public Result deleteBatch(@RequestParam("ids") List<Long> ids) {
         log.info("delete dishes in batch by ids:{}", ids);
         dishService.deleteBatch(ids);
+        // clear all dish cache
+        clearCache("dish_*");
         return Result.success();
     }
 
@@ -82,6 +94,8 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("update dish with flavor:{}", dishDTO);
         dishService.updateDishWithFlavor(dishDTO);
+        // clear all dish cache
+        clearCache("dish_*");
         return Result.success();
     }
 
@@ -98,4 +112,11 @@ public class DishController {
         return Result.success(list);
     }
 
+    private void clearCache(String pattern) {
+        // get all keys that match the pattern
+        Set keys = redisTemplate.keys(pattern);
+        // delete all matching keys
+        redisTemplate.delete(keys);
+        log.info("Cleared cache with pattern: {}", pattern);
+    }
 }
