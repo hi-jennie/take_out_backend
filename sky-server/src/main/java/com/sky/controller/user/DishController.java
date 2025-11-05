@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController("userDishController")
@@ -38,10 +39,20 @@ public class DishController {
         // construct the query key
         String key = "dish_" + categoryId;
 
+
+//        if (redisTemplate.opsForValue().get(key) != null) {
+//            String s = redisTemplate.opsForValue().get(key).getClass() + "";
+//            System.out.println(s);
+//        }
+
         // query in redis cache first
-        List<DishVO> dishes = (List<DishVO>) redisTemplate.opsForValue().get(key);
-        if (dishes != null && dishes.size() > 0) {
-            log.info("Get dishes from redis...");
+        List<DishVO> dishes = (ArrayList<DishVO>) redisTemplate.opsForValue().get(key);
+        if (dishes != null && !dishes.isEmpty()) {
+//            for (DishVO dish : dishes) {
+//                System.out.println(19);
+//                System.out.println(dish.toString() + "1");
+//            }
+            log.info("get dishes from redis");
             return Result.success(dishes);
         }
 
@@ -52,6 +63,7 @@ public class DishController {
 
         // query from database
         dishes = dishService.listWithFlavor(dish);
+//        System.out.println(dishes.getClass() + "!!!!!!!!");
         // store the query result into redis
         redisTemplate.opsForValue().set(key, dishes);
 
