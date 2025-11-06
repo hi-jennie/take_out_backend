@@ -45,4 +45,12 @@ public class ShoppingCartController {
         shoppingCartService.clear();
         return Result.success();
     }
+
+    @PostMapping("/sub")
+    @ApiOperation("subtract amount by 1")
+    public Result subAmount(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+        log.info("subtract the amount by 1: {}", shoppingCartDTO);
+        shoppingCartService.subBy1(shoppingCartDTO);
+        return Result.success();
+    }
 }

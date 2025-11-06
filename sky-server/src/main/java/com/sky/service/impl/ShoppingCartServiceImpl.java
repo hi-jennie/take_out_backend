@@ -44,7 +44,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if (cartList != null && !cartList.isEmpty()) {
             ShoppingCart shoppingCartItem = cartList.get(0);
             shoppingCartItem.setNumber(shoppingCartItem.getNumber() + 1);
-            shoppingCartMapper.updateNumberById(shoppingCartItem);
+            shoppingCartMapper.update(shoppingCartItem);
         }
         // 3. if not exists, insert a new record with quantity 1
         else {
@@ -81,6 +81,23 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void clear() {
         Long userId = BaseContext.getCurrentId();
         shoppingCartMapper.deleteByUserId(userId);
+    }
+
+    /**
+     * subtract th amount by 1
+     *
+     * @param shoppingCartDTO
+     */
+    public void subBy1(ShoppingCartDTO shoppingCartDTO) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUserId(BaseContext.getCurrentId());
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+        if (shoppingCartList != null && !shoppingCartList.isEmpty()) {
+            ShoppingCart curShoppingItem = shoppingCartList.get(0);
+            curShoppingItem.setNumber(curShoppingItem.getNumber() - 1);
+            shoppingCartMapper.update(curShoppingItem);
+        }
     }
 }
 
