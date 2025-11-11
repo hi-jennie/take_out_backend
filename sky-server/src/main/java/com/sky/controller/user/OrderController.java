@@ -79,4 +79,18 @@ public class OrderController {
         OrderVO orderVO = orderService.getWithDetailsById(id);
         return Result.success(orderVO);
     }
+
+    /**
+     * not delete this order from order table, but change the order status
+     *
+     * @param id
+     * @return
+     */
+    @PutMapping("/cancel/{id}")
+    @ApiOperation("cancel order by id")
+    public Result cancel(@PathVariable Long id) throws Exception {
+        log.info("cancel order of id : {}", id);
+        orderService.userCancelById(id);
+        return Result.success();
+    }
 }

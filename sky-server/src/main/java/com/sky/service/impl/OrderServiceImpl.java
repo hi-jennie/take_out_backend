@@ -201,4 +201,46 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
         }
     }
+
+    /**
+     * change the status to 6 but do some validation before cancellation
+     * private Integer status;
+     *
+     * @param id
+     */
+    public void userCancelById(Long id) throws Exception {
+        // get the order first to check what status of this order
+        Orders currOrders = orderMapper.getById(id);
+        // check if the order exists
+        if (currOrders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        Integer currStatus = currOrders.getStatus();
+        // merchant confirmed and in delivery can't be canceled.
+        if (currStatus > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(currOrders.getId());
+        if (currStatus.equals(Orders.TO_BE_CONFIRMED)) {
+//            //invoke wechat refund api
+//            weChatPayUtil.refund(
+//                    ordersDB.getNumber(), // merchant order number
+//                    ordersDB.getNumber(), // merchant refund number
+//                    new BigDecimal(0.01),//单位 元 refund amount
+//                    new BigDecimal(0.01));//original order amount
+//
+//            // change pay_status to REFUND
+//            orders.setPayStatus(Orders.REFUND);
+        }
+
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason("用户取消");
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+
+
+    }
 }
