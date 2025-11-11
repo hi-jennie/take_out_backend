@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -9,7 +11,7 @@ public interface OrderMapper {
     void insert(Orders currentOrder);
 
     /**
-     * 根据订单号查询订单
+     * get order information by order number
      *
      * @param orderNumber
      */
@@ -17,9 +19,17 @@ public interface OrderMapper {
     Orders getByNumber(String orderNumber);
 
     /**
-     * 修改订单信息
+     * change order information
      *
      * @param orders
      */
     void update(Orders orders);
+
+    /**
+     * return a list of condition
+     *
+     * @param ordersPageQueryDTO is used encapsulating query conditions
+     * @return
+     */
+    Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 }

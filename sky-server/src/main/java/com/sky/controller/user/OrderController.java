@@ -2,7 +2,9 @@ package com.sky.controller.user;
 
 
 import com.sky.dto.OrdersDTO;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
@@ -49,5 +51,17 @@ public class OrderController {
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
         log.info("generate prepaid token：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
+    }
+
+    /**
+     * query historical orders
+     */
+    @GetMapping("/historyOrders")
+    @ApiOperation("query historical orders")
+    public Result<PageResult> getHistoryOrders(OrdersPageQueryDTO ordersPageQueryDTO) {
+        log.info("this user is querying the history orders page: {}", ordersPageQueryDTO);
+        PageResult pageResult = orderService.pageQueryFromUser(ordersPageQueryDTO);
+        return Result.success(pageResult);
+
     }
 }

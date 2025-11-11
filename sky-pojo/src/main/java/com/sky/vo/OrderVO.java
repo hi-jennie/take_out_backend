@@ -5,6 +5,7 @@ import com.sky.entity.Orders;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderVO extends Orders implements Serializable {
+    //  OrderVO inherits all the fields and methods from the parent class (Orders)
 
     //订单菜品信息
     private String orderDishes;
