@@ -178,4 +178,27 @@ public class OrderServiceImpl implements OrderService {
         }
         return new PageResult(page.getTotal(), orderVOList);
     }
+
+    /**
+     * get order with details list by orderId
+     *
+     * @param id
+     * @return
+     */
+    public OrderVO getWithDetailsById(Long id) {
+        // get the order in orders table first
+        Orders order = orderMapper.getById(id);
+
+        // using the order id to get the order details in order_detail table
+        if (order != null) {
+            List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(order.getId());
+            OrderVO orderVO = new OrderVO();
+            BeanUtils.copyProperties(order, orderVO);
+            orderVO.setOrderDetailList(orderDetailList);
+
+            return orderVO;
+        } else {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+    }
 }
