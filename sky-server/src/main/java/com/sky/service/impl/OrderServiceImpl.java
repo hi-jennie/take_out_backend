@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -74,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         currentOrder.setConsignee(address.getConsignee());
         currentOrder.setNumber(String.valueOf(System.currentTimeMillis()));
         currentOrder.setUserId(userId);
-        currentOrder.setStatus(Orders.PENDING_PAYMENT);
+        currentOrder.setStatus(Orders.TO_BE_CONFIRMED);
         currentOrder.setPayStatus(Orders.PAID);
         currentOrder.setDeliveryStatus(1);
         currentOrder.setOrderTime(LocalDateTime.now());
@@ -243,4 +244,28 @@ public class OrderServiceImpl implements OrderService {
 
 
     }
+
+    /**
+     * the logic is find the order detail and convert it to shopping cart item.
+     * and the user make an order again.
+     *
+     * @param id
+     */
+    @Transactional
+    public void orderRepetition(Long id) {
+        Long userId = BaseContext.getCurrentId();
+
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+
+        // convert each item in orderDetailList to ShoppingCart item. and re- inject into shoppingCart table.
+        List<ShoppingCart> shoppingCartList = orderDetailList.stream().map(orderDetail -> {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail, shoppingCart, "id");
+            shoppingCart.setUserId(userId);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            return shoppingCart;
+        }).collect(Collectors.toList());
+        shoppingCartMapper.insertBatch(shoppingCartList);
+    }
+
 }

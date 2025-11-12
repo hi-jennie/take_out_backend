@@ -93,4 +93,18 @@ public class OrderController {
         orderService.userCancelById(id);
         return Result.success();
     }
+
+    /**
+     * the logic is find the order detail and convert it to shopping cart item.
+     * and the user make an order again.
+     *
+     * @param id order id
+     * @return
+     */
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("order repetition by id")
+    public Result orderRepetition(@PathVariable Long id) {
+        orderService.orderRepetition(id);
+        return Result.success();
+    }
 }
