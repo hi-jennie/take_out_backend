@@ -8,6 +8,7 @@ import com.sky.context.BaseContext;
 import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -19,6 +20,7 @@ import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private AddressBookMapper addressBookMapper;
@@ -290,6 +293,35 @@ public class OrderServiceImpl implements OrderService {
 
         return new PageResult(ordersPage.getTotal(), orderVOList);
 
+    }
+
+    /**
+     * reject an order;
+     *
+     * @param rejectionDTO
+     */
+    public void reject(OrdersRejectionDTO rejectionDTO) throws Exception {
+        Orders ordersDB = orderMapper.getById(rejectionDTO.getId());
+        // only when the status is TO_BE_CONFIRMED, the order can be canceled✅;
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        // if the payStatus is PAID, then refund first;
+        if (ordersDB.getPayStatus().equals(Orders.PAID)) {
+            // TODO refund;
+            log.info("the admin request a refund for order(id: {})", rejectionDTO.getId());
+        }
+
+        // update corresponding infos;
+        // !!! the database will indeed only update these non-null fields, and all other fields will remain unchanged ✅.
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setRejectionReason(rejectionDTO.getRejectionReason());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setPayStatus(Orders.REFUND);
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
     }
 
     private List<OrderVO> getOrderVOList(Page<Orders> ordersPage) {
