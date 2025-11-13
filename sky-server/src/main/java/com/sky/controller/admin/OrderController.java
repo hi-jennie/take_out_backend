@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.OrdersCancelDTO;
 import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersRejectionDTO;
@@ -57,14 +58,22 @@ public class OrderController {
     /**
      * confirm order
      *
-     * @param id
+     * @param confirmDTO
      * @return
      */
     @PutMapping("/confirm")
     @ApiOperation("admin confirm order")
-    public Result confirm(@RequestBody OrdersConfirmDTO confirmDTO) {
+    public Result confirm(@RequestBody OrdersConfirmDTO confirmDTO) throws Exception {
         log.info("admin confirm the order(id: {}", confirmDTO.getId());
         orderService.confirm(confirmDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/cancel")
+    @ApiOperation("cancel order")
+    public Result cancel(@RequestBody OrdersCancelDTO cancelDTO) {
+        log.info("cancel order id {}", cancelDTO.getId());
+        orderService.cancel(cancelDTO);
         return Result.success();
     }
 }

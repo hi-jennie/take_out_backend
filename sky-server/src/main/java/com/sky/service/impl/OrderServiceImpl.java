@@ -326,9 +326,10 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param confirmDTO
      */
-    public void confirm(OrdersConfirmDTO confirmDTO) {
+    public void confirm(OrdersConfirmDTO confirmDTO) throws Exception {
+        // TODO not sure !!!
         Orders ordersDB = orderMapper.getById(confirmDTO.getId());
-        
+
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
@@ -342,6 +343,30 @@ public class OrderServiceImpl implements OrderService {
         } else {
             orders.setEstimatedDeliveryTime(ordersDB.getDeliveryTime().plusHours(1));
         }
+        orderMapper.update(orders);
+    }
+
+    /**
+     * cancel order
+     *
+     * @param cancelDTO
+     */
+    public void cancel(OrdersCancelDTO cancelDTO) {
+        Orders ordersDB = orderMapper.getById(cancelDTO.getId());
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Integer orderStatus = ordersDB.getStatus();
+        Orders orders = new Orders();
+        if (orderStatus.equals(Orders.CONFIRMED)) {
+            // TODO refund
+            log.info("application for refund");
+        }
+
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason(cancelDTO.getCancelReason());
+        orders.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders);
     }
 
