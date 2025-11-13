@@ -268,4 +268,57 @@ public class OrderServiceImpl implements OrderService {
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
 
+    /**
+     * admin search order by condition
+     * (separate the functionality by extract some functionality to method;)
+     *
+     * @param pageQueryDTO
+     * @return
+     */
+    @Transactional
+    public PageResult conditionSearch(OrdersPageQueryDTO pageQueryDTO) {
+        // search order in orders table first
+        PageHelper.startPage(pageQueryDTO.getPage(), pageQueryDTO.getPageSize());
+
+        // Select orders that meet the conditions first;
+        Page<Orders> ordersPage = orderMapper.pageQuery(pageQueryDTO);
+        if (ordersPage == null || ordersPage.isEmpty()) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        // we need add orderDishes  into the return item;
+        List<OrderVO> orderVOList = getOrderVOList(ordersPage);
+
+        return new PageResult(ordersPage.getTotal(), orderVOList);
+
+    }
+
+    private List<OrderVO> getOrderVOList(Page<Orders> ordersPage) {
+        List<OrderVO> orderVOList = new ArrayList<>();
+
+        // iterate the ordersPage to get the id and query the order detail table to get the dishNames
+        for (Orders orders : ordersPage) {
+            OrderVO orderVO = new OrderVO();
+
+            String orderDishesStr = getOrderDishesStr(orders);
+
+            BeanUtils.copyProperties(orders, orderVO);
+            orderVO.setOrderDishes(orderDishesStr);
+            orderVOList.add(orderVO);
+        }
+        return orderVOList;
+    }
+
+    private String getOrderDishesStr(Orders orders) {
+        // get order detail
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+
+        // get the dishName and amount, then convert it to orderDish string
+        List<String> dishesStrList = orderDetailList.stream().map(orderDetail -> {
+            String dishName = orderDetail.getName();
+            Integer amount = orderDetail.getNumber();
+            return dishName + "*" + amount + ",";
+        }).collect(Collectors.toList());
+
+        return String.join(",", dishesStrList);
+    }
 }
