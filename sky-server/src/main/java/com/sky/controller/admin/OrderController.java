@@ -71,9 +71,27 @@ public class OrderController {
 
     @PutMapping("/cancel")
     @ApiOperation("cancel order")
-    public Result cancel(@RequestBody OrdersCancelDTO cancelDTO) {
+    public Result cancel(@RequestBody OrdersCancelDTO cancelDTO) throws Exception {
         log.info("cancel order id {}", cancelDTO.getId());
         orderService.cancel(cancelDTO);
         return Result.success();
     }
+
+    @PutMapping("/delivery/{id}")
+    @ApiOperation("deliver order")
+    public Result deliver(@PathVariable Long id) throws Exception {
+        log.info("delivery order id: {}", id);
+        orderService.deliver(id);
+        return Result.success();
+    }
+
+    @PutMapping("/complete/{id}")
+    @ApiOperation("complete order")
+    public Result complete(@PathVariable Long id) throws Exception {
+        log.info("complete order id: {}", id);
+        orderService.complete(id);
+        return Result.success();
+    }
+
+
 }

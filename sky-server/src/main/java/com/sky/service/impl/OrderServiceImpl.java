@@ -370,6 +370,43 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(orders);
     }
 
+    /**
+     * deliver order
+     *
+     * @param id
+     * @throws Exception
+     */
+    public void deliver(Long id) throws Exception {
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(orders);
+    }
+
+    /**
+     * complete order(generally, In real-world business scenarios： after deliver complete delivery)
+     * here we assume the order is delivered by merchant themselves and press the complete after complete delivery
+     *
+     * @param id
+     */
+    public void complete(Long id) throws Exception {
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.COMPLETED);
+        orders.setDeliveryTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
     private List<OrderVO> getOrderVOList(Page<Orders> ordersPage) {
         List<OrderVO> orderVOList = new ArrayList<>();
 
