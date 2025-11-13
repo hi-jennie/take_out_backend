@@ -15,6 +15,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -283,13 +284,31 @@ public class OrderServiceImpl implements OrderService {
         // Select orders that meet the conditions first;
         Page<Orders> ordersPage = orderMapper.pageQuery(pageQueryDTO);
         if (ordersPage == null || ordersPage.isEmpty()) {
-            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+            // when log into the web, will request conditionSearch //page//1//pageSize//10//status//2
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND + "conditionSearch");
         }
         // we need add orderDishes  into the return item;
         List<OrderVO> orderVOList = getOrderVOList(ordersPage);
 
         return new PageResult(ordersPage.getTotal(), orderVOList);
 
+    }
+
+    /**
+     * get statistics of different order status
+     *
+     * @return
+     */
+    public OrderStatisticsVO statistics() {
+        Integer toBeConfirmed = orderMapper.getAmountByStatus(Orders.TO_BE_CONFIRMED);
+        Integer confirmed = orderMapper.getAmountByStatus(Orders.CONFIRMED);
+        Integer deliveryInProgress = orderMapper.getAmountByStatus(Orders.DELIVERY_IN_PROGRESS);
+
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setToBeConfirmed(toBeConfirmed);
+        orderStatisticsVO.setConfirmed(confirmed);
+        orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
+        return orderStatisticsVO;
     }
 
     /**
@@ -301,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
         Orders ordersDB = orderMapper.getById(rejectionDTO.getId());
         // only when the status is TO_BE_CONFIRMED, the order can be canceled✅;
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
-            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR + "reject");
         }
 
         // if the payStatus is PAID, then refund first;
@@ -331,7 +350,7 @@ public class OrderServiceImpl implements OrderService {
         Orders ordersDB = orderMapper.getById(confirmDTO.getId());
 
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
-            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR + "confirm");
         }
 
         Orders orders = new Orders();
@@ -351,10 +370,10 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param cancelDTO
      */
-    public void cancel(OrdersCancelDTO cancelDTO) {
+    public void cancel(OrdersCancelDTO cancelDTO) throws Exception {
         Orders ordersDB = orderMapper.getById(cancelDTO.getId());
         if (ordersDB == null) {
-            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND + "cancel");
         }
         Integer orderStatus = ordersDB.getStatus();
         Orders orders = new Orders();
@@ -379,7 +398,7 @@ public class OrderServiceImpl implements OrderService {
     public void deliver(Long id) throws Exception {
         Orders ordersDB = orderMapper.getById(id);
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.CONFIRMED)) {
-            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR + "deliver");
         }
 
         Orders orders = new Orders();
@@ -397,7 +416,7 @@ public class OrderServiceImpl implements OrderService {
     public void complete(Long id) throws Exception {
         Orders ordersDB = orderMapper.getById(id);
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
-            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR + "complete");
         }
 
         Orders orders = new Orders();

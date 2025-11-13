@@ -7,6 +7,7 @@ import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController("adminOrderController")
 @RequestMapping("/admin/order")
-@Api("admin - order related api")
+@Api(tags = "admin - order related api")
 @Slf4j
 public class OrderController {
 
@@ -45,6 +46,14 @@ public class OrderController {
         log.info("get order with corresponding details by id: {}", id);
         OrderVO orderVO = orderService.getWithDetailsById(id);
         return Result.success(orderVO);
+    }
+
+    @GetMapping("/ordersStatistics")
+    @ApiOperation("Statistics of the number of orders in each status")
+    public Result<OrderStatisticsVO> statistic() {
+        log.info("get statistics of the number of orders in each status");
+        OrderStatisticsVO statistics = orderService.statistics();
+        return Result.success(statistics);
     }
 
     @PutMapping("/rejection")
