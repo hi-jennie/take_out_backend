@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
@@ -50,6 +51,20 @@ public class OrderController {
     public Result reject(@RequestBody OrdersRejectionDTO rejectionDTO) throws Exception {
         log.info("the order of id {} is rejected by admin", rejectionDTO);
         orderService.reject(rejectionDTO);
+        return Result.success();
+    }
+
+    /**
+     * confirm order
+     *
+     * @param id
+     * @return
+     */
+    @PutMapping("/confirm")
+    @ApiOperation("admin confirm order")
+    public Result confirm(@RequestBody OrdersConfirmDTO confirmDTO) {
+        log.info("admin confirm the order(id: {}", confirmDTO.getId());
+        orderService.confirm(confirmDTO);
         return Result.success();
     }
 }

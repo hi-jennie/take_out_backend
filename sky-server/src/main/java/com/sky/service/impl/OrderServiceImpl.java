@@ -5,10 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersRejectionDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -321,6 +318,30 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.CANCELLED);
         orders.setPayStatus(Orders.REFUND);
         orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
+    /**
+     * confirm an order
+     *
+     * @param confirmDTO
+     */
+    public void confirm(OrdersConfirmDTO confirmDTO) {
+        Orders ordersDB = orderMapper.getById(confirmDTO.getId());
+        
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        orders.setStatus(Orders.CONFIRMED);
+        Integer deliverStatus = ordersDB.getDeliveryStatus();
+        if (deliverStatus == 1) {
+            orders.setEstimatedDeliveryTime(LocalDateTime.now().plusHours(1));
+        } else {
+            orders.setEstimatedDeliveryTime(ordersDB.getDeliveryTime().plusHours(1));
+        }
         orderMapper.update(orders);
     }
 
