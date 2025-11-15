@@ -47,4 +47,6 @@ public interface OrderService {
     void complete(Long id) throws Exception;
 
     OrderStatisticsVO statistics();
+
+    void remind(Long id);
 }

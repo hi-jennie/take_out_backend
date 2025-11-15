@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -18,6 +19,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.webSocketServer.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Transactional
     public OrderSubmitVO submit(OrdersDTO ordersDTO) {
@@ -102,6 +109,16 @@ public class OrderServiceImpl implements OrderService {
                 .orderTime(currentOrder.getOrderTime())
                 .orderNumber(currentOrder.getNumber())
                 .orderAmount(currentOrder.getAmount()).build();
+
+        // here we assume when we submit the order, the payment is successful directly.
+        Map message = new HashMap<>();
+        message.put("type", 1);
+        message.put("orderId", currentOrder.getId());
+        message.put("content", currentOrder.getNumber());
+
+        String jsonString = JSON.toJSONString(message);
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(jsonString));
         return orderSubmitVO;
     }
 
@@ -153,6 +170,10 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // TODO Notify the admin front-end page via WebSocket that the payment was successful,
+        //  and notify the merchant that there is a new order.
+        // but here, we didn't implement it. we just implement it when submit order.
     }
 
     @Transactional
@@ -424,6 +445,21 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.COMPLETED);
         orders.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    /**
+     * customer urging to expedite the order
+     *
+     * @param id
+     */
+    public void remind(Long id) {
+        Orders orders = orderMapper.getById(id);
+        Map message = new HashMap<>();
+        message.put("type", 2); // 1 represent new order/ 2 represent customer urging to expedite the order
+        message.put("orderId", orders.getId());
+        message.put("content", orders.getNumber());
+        String jsonString = JSON.toJSONString(message);
+        webSocketServer.sendToAllClient(jsonString);
     }
 
     private List<OrderVO> getOrderVOList(Page<Orders> ordersPage) {

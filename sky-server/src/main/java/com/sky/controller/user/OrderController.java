@@ -107,5 +107,18 @@ public class OrderController {
         orderService.orderRepetition(id);
         return Result.success();
     }
-    
+
+    /**
+     * customer urging to expedite the order
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("order reminder")
+    public Result reminder(@PathVariable Long id) {
+        log.info("customer urging to expedite the order {}", id);
+        orderService.remind(id);
+        return Result.success();
+    }
 }

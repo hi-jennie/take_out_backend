@@ -52,7 +52,7 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             // cause when jenerate the token, we put emp id in the payload
             Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
 
-            // hold the current emp id in ThreadLocal so that service layer can use it
+            // hold the current user id in ThreadLocal so that service layer can use it
             BaseContext.setCurrentId(userId);
 
             log.info("id of current user：", userId);
