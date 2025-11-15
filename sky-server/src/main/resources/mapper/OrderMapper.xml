@@ -68,7 +68,7 @@
         </where>
         order by order_time desc
     </select>
-    <select id="getTurnOverStatistics" resultType="java.lang.Double">
+    <select id="countByMap" resultType="java.lang.Double">
         select sum(amount)
         from orders
         <where>

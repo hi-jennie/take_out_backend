@@ -66,5 +66,5 @@ public interface OrderMapper {
     @Select("select * from orders where status=#{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndOrderTime(Integer status, LocalDateTime orderTime);
 
-    Double getTurnOverStatistics(Map map);
+    Double countByMap(Map map);
 }
