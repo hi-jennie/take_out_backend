@@ -67,4 +67,13 @@ public interface OrderMapper {
     List<Orders> getByStatusAndOrderTime(Integer status, LocalDateTime orderTime);
 
     Double countByMap(Map map);
+
+    /**
+     * get the order amount of specific time and status
+     * query condition are encapsulated in map
+     *
+     * @param map
+     * @return
+     */
+    Integer getOrderAmountByMap(Map map);
 }

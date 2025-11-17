@@ -4,6 +4,7 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang.StringUtils;
@@ -36,13 +37,7 @@ public class ReportServiceImpl implements ReportService {
      */
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
         // get the dateList first;
-        List<LocalDate> dateList = new ArrayList<>();
-
-        dateList.add(begin);
-        while (!begin.equals(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
+        List<LocalDate> dateList = generateDateList(begin, end);
 
         List<Double> turnoverList = new ArrayList<>();
         //  get turnoverStatistics
@@ -75,13 +70,7 @@ public class ReportServiceImpl implements ReportService {
      */
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
         // get the dateList first;
-        List<LocalDate> dateList = new ArrayList<>();
-
-        dateList.add(begin);
-        while (!begin.equals(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
+        List<LocalDate> dateList = generateDateList(begin, end);
 
         // each single Integer is the total user amount and new user amount of the specific day
         List<Integer> totalUserList = new ArrayList<>();
@@ -108,6 +97,66 @@ public class ReportServiceImpl implements ReportService {
                 .totalUserList(StringUtils.join(totalUserList, ","))
                 .newUserList(StringUtils.join(newUserList, ","))
                 .build();
+    }
+
+
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        // generate a dateList
+        List<LocalDate> dateList = generateDateList(begin, end);
+
+        List<Integer> orderCountList = new ArrayList<>();
+        List<Integer> validOrderCountList = new ArrayList<>();
+        Integer totalOrderCount = 0;
+        Integer validOrderCount = 0;
+        Double orderCompletionRate = 0.0;
+
+        for (LocalDate localDate : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(localDate, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(localDate, LocalTime.MAX);
+
+            Integer totalOrder = getOrderAmount(beginTime, endTime, null);
+            Integer validOrder = getOrderAmount(beginTime, endTime, Orders.COMPLETED);
+            orderCountList.add(totalOrder);
+            validOrderCountList.add(validOrder);
+
+            totalOrderCount += totalOrder;
+            validOrderCount += validOrder;
+
+        }
+
+        if (totalOrderCount != 0) {
+            orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+        }
+
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .orderCountList(StringUtils.join(orderCountList, ","))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ","))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(orderCompletionRate)
+                .build();
+    }
+
+    private List<LocalDate> generateDateList(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        return dateList;
+    }
+
+    private Integer getOrderAmount(LocalDateTime beginTime, LocalDateTime endTime, Integer status) {
+        Map map = new HashMap<>();
+        map.put("begin", beginTime);
+        map.put("end", endTime);
+        map.put("status", status);
+
+        Integer orderAmount = orderMapper.getOrderAmountByMap(map);
+        return orderAmount;
     }
 
 
