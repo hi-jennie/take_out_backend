@@ -5,6 +5,8 @@ import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.time.LocalDate;
 
 public interface ReportService {
@@ -16,5 +18,10 @@ public interface ReportService {
 
     SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end);
 
-
+    /**
+     * using apache poi to generate business report excel file and export it
+     *
+     * @param response
+     */
+    void exportBusinessData(HttpServletResponse response) throws FileNotFoundException;
 }
