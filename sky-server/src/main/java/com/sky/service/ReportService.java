@@ -15,4 +15,6 @@ public interface ReportService {
     OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end);
 
     SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end);
+
+
 }

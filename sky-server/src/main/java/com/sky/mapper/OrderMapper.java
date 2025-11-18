@@ -86,4 +86,5 @@ public interface OrderMapper {
      * @return
      */
     List<GoodsSalesDTO> getTop10(LocalDateTime begin, LocalDateTime end);
+
 }

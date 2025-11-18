@@ -134,4 +134,5 @@
         ORDER BY number DESC
         LIMIT 0, 10;
     </select>
+    
 </mapper>

@@ -67,4 +67,14 @@
             <if test="status != null">AND status = #{status}</if>
         </where>
     </select>
+
+    <!--  get the dish amount of specific status-->
+    <select id="getDishAmountByStatus" resultType="java.lang.Integer">
+        select count(id) from dish
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>

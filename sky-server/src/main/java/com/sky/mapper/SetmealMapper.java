@@ -39,4 +39,9 @@ public interface SetmealMapper {
     List<Setmeal> getList(Setmeal setmeal);
 
     List<DishItemVO> getDishItemBySetmealId(Long setmealId);
+
+    /*
+     * get setmeal amount of different status
+     */
+    Integer getSetmealAmountByStatus(Integer status);
 }

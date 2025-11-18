@@ -65,4 +65,14 @@
                  left join dish on s.dish_id = dish.id
         where setmeal_id = #{setmealId}
     </select>
+
+    <!--  get the setmeal amount of specific status-->
+    <select id="getSetmealAmountByStatus" resultType="java.lang.Integer">
+        select count(id) from setmeal
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>

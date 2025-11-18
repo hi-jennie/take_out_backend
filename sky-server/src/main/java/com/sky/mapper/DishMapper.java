@@ -68,4 +68,6 @@ public interface DishMapper {
      * @return
      */
     List<Dish> getDishList(Dish dish);
+
+    Integer getDishAmountByStatus(Integer status);
 }
